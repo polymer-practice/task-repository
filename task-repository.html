@@ -1,4 +1,4 @@
-<link rel="import" href="../polymer/polymer-element.html">
+<link rel="import" href="./bower_components/polymer/polymer-element.html">
 
 <dom-module id="task-repository">
   <template>
@@ -9,11 +9,204 @@
       static get is() { return 'task-repository'; }
       static get properties() {
         return {
-          prop1: {
+          loading: {
+            type: Boolean,
+            value: false,
+            reflectToAttribute: true
+          },
+          offset: {
+            type: Number,
+            value: 0
+          },
+          limit: {
+            type: Number,
+            value: 5
+          },
+          newTaks: {
             type: String,
-            value: 'task-repository'
+            value: '',
+            observer: '_createNewTask'
           }
         };
+      }
+
+      static get observers() {
+        return [
+          '_getPage(offset, limit)'
+        ];
+      }
+
+      constructor() {
+        super();
+        this.taskList = [
+          {
+            title: 'To do the weekly shopping',
+            canceled: false,
+            done: false
+          },
+          {
+            title: 'Call the dentist',
+            canceled: true,
+            done: false
+          },
+          {
+            title: 'Teach Polymer',
+            canceled: false,
+            done: true
+          },
+          {
+            title: 'Go at vacations',
+            canceled: false,
+            done: false
+          },
+          {
+            title: 'Finish the danger bot',
+            canceled: true,
+            done: false
+          },
+          {
+            title: 'Learn scratch',
+            canceled: false,
+            done: true
+          },
+          {
+            title: 'Build Skynet',
+            canceled: false,
+            done: false
+          },
+          {
+            title: 'Learn to shot a gun',
+            canceled: true,
+            done: false
+          },
+          {
+            title: 'To become president of a country',
+            canceled: false,
+            done: true
+          },
+          {
+            title: 'To create a communist dictatorship',
+            canceled: false,
+            done: false
+          },
+          {
+            title: 'To create a fascist dictatorship.',
+            canceled: true,
+            done: false
+          },
+          {
+            title: 'To learn how to ride a hourse',
+            canceled: false,
+            done: true
+          },
+          {
+            title: 'Organize a medieval tournament',
+            canceled: false,
+            done: false
+          },
+          {
+            title: 'Buy two machinegunns for the medieval tournamente',
+            canceled: true,
+            done: false
+          },
+          {
+            title: 'Draw cartoons about a black mouse',
+            canceled: false,
+            done: true
+          },
+          {
+            title: 'Draw cartoons about a white duck who needs to go to a speech therapist',
+            canceled: false,
+            done: false
+          },
+          {
+            title: 'Draw cartoons about a stupid and stuttering dog',
+            canceled: true,
+            done: false
+          },
+          {
+            title: 'Hire a lawyer to avoid copyrights penalty from Disney',
+            canceled: false,
+            done: true
+          },
+          {
+            title: 'Buy a laser saber',
+            canceled: false,
+            done: false
+          },
+          {
+            title: 'Found a Jedi religion.',
+            canceled: true,
+            done: false
+          }
+        ]
+      }
+
+      _getPage() {
+        const begin = this.offset;
+        const end = begin + this.limit;
+        const total = this.taskList.length
+
+        let pageEvent;
+
+        if ((total >= end) && (begin >= 0)){
+          pageEvent = new CustomEvent(
+            'page-event',
+            {
+              bubbles: true,
+              composed: true,
+              detail: {
+                page: this.taskList.slice(this.offset, end),
+                total: total,
+                offset: this.offset,
+                limit: this.limit
+              }
+            }
+          );
+        } else {
+          pageEvent = new CustomEvent(
+            'page-error',
+            {
+              bubbles: true,
+              composed: true,
+              detail: {
+                errorMsg: 'Page out of range'
+              }
+            }
+          )
+        }
+        this.loading = true;
+        setTimeout(() => {
+          this.loading = false;
+          this.dispatchEvent(pageEvent);
+        }, 300)
+      }
+
+      _createNewTask(newValue) {
+        let newEvent;
+
+        if (newValue) {
+          this.loading = true;
+
+          newEvent = new CustomEvent(
+            'task-created',
+            {
+              bubbles: true,
+              composed: true
+            }
+          );
+
+          this.taskList.push({
+            title: newValue,
+            canceled: false,
+            done: false
+          });
+
+          setTimeout(() => {
+            this.loading = false;
+            this.dispatchEvent(newEvent);
+          }, 300);
+        }
       }
     }
 

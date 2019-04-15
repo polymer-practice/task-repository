@@ -6,10 +6,10 @@
 
     <title>task-repository demo</title>
 
-    <script src="../../webcomponentsjs/webcomponents-loader.js"></script>
+    <script src="../bower_components/webcomponentsjs/webcomponents-loader.js"></script>
 
-    <link rel="import" href="../../iron-demo-helpers/demo-pages-shared-styles.html">
-    <link rel="import" href="../../iron-demo-helpers/demo-snippet.html">
+    <link rel="import" href="../bower_components/iron-demo-helpers/demo-pages-shared-styles.html">
+    <link rel="import" href="../bower_components/iron-demo-helpers/demo-snippet.html">
     <link rel="import" href="../task-repository.html">
 
     <custom-style>
@@ -22,8 +22,63 @@
       <h3>Basic task-repository demo</h3>
       <demo-snippet>
         <template>
-          <task-repository></task-repository>
+          <task-repository id="repository"></task-repository>
+          <button type="button" id='next-page'>Next page</button>
+          <button type="button" id='prev-page'>Prev page</button>
+          <input type="text" id="input-text">
+          <button type="button" id='create-task'>Create new task</button><br/>
+          <code id='result'></code>
         </template>
+        <script>
+          let page = 0;
+          
+          const repo = document.getElementById('repository');
+          const nextButton = document.getElementById('next-page');
+          const prevButton = document.getElementById('prev-page');
+          const codeBoard = document.getElementById('result');
+          const createNewTask = document.getElementById('create-task');
+          const inputTask = document.getElementById('input-text');
+
+          repo.addEventListener('page-event', event => {
+            console.log('Loading: ', repo.loading);
+            page = Math.ceil(event.detail.offset/event.detail.limit);
+            codeBoard.innerText = JSON.stringify(event.detail.page, null, 4);
+          });
+
+          repo.addEventListener('page-error', event => {
+            console.log('Loading: ', repo.loading);
+            codeBoard.innerText = event.detail.errorMsg;
+          });
+
+          repo.addEventListener('task-created', () => { 
+            console.log('task created');
+            page = 0;
+            repo.limit = 5;
+            repo.offset = 0;
+          })
+
+          nextButton.addEventListener('click', ()=> {
+            console.log('Loading: ', repo.loading);
+            const limit = 5;
+            const offset = limit * (page + 1);
+            repo.limit = limit;
+            repo.offset = offset;
+          });
+
+          prevButton.addEventListener('click', () => {
+            console.log('Loading: ', repo.loading);
+            const limit = 5;
+            const offset = limit * (page - 1);
+            repo.limit = limit;
+            repo.offset = offset;
+          });
+
+          createNewTask.addEventListener('click', () => {
+            console.log('Loading: ', repo.loading);
+            const taskTitle = inputTask.value;
+            repo.newTaks = taskTitle;
+          });
+        </script>
       </demo-snippet>
     </div>
   </body>
