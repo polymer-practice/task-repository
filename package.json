@@ -1,0 +1,17 @@
+{
+  "name": "task-repository",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "build": "dev-tools"
+  },
+  "devDependencies": {
+    "dev-tools": "git@github.com:polymer-practice/dev-tools.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
