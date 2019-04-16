@@ -217,7 +217,7 @@
       _updateTask(updateData) {
         let newEvent;
 
-        if (updateData && updateData.key) {
+        if (updateData && (updateData.key != null)) {
           this.loading = true;
           Object.assign(
             this.taskList[updateData.key],
