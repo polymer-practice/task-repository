@@ -26,7 +26,9 @@
           <button type="button" id='next-page'>Next page</button>
           <button type="button" id='prev-page'>Prev page</button>
           <input type="text" id="input-text">
-          <button type="button" id='create-task'>Create new task</button><br/>
+          <button type="button" id='create-task'>Create new task</button>
+          <button type="button" id='set-done-task'>Set done task 1</button>
+          <button type="button" id='set-cancel-task'>Set cancel task 1</button><br/>
           <code id='result'></code>
         </template>
         <script>
@@ -38,6 +40,8 @@
           const codeBoard = document.getElementById('result');
           const createNewTask = document.getElementById('create-task');
           const inputTask = document.getElementById('input-text');
+          const setDoneTask = document.getElementById('set-done-task');
+          const setCancelTask = document.getElementById('set-cancel-task');
 
           repo.addEventListener('page-event', event => {
             console.log('Loading: ', repo.loading);
@@ -50,12 +54,42 @@
             codeBoard.innerText = event.detail.errorMsg;
           });
 
-          repo.addEventListener('task-created', () => { 
+          repo.addEventListener('task-created', () => {
+            const limit = 5;
+            const offset = 0;
+            console.log('Loading: ', repo.loading); 
             console.log('task created');
             page = 0;
-            repo.limit = 5;
-            repo.offset = 0;
+            if ((limit === repo.limit) && (offset === repo.offset)) {
+              repo.getPage();
+            } else {
+              repo.limit = limit;
+              repo.offset = offset;
+            }
+          });
+
+          repo.addEventListener('update-task', event => {
+            console.log('Loading: ', repo.loading);
+            codeBoard.innerText = JSON.stringify(event.detail.taskUpdated);
           })
+
+          setDoneTask.addEventListener('click', () => {
+            console.log('Loading: ', repo.loading);
+            repo.updateData = {
+              key: 1,
+              canceled: false,
+              done: true
+            }
+          });
+
+          setCancelTask.addEventListener('click', () => {
+            console.log('Loading: ', repo.loading);
+            repo.updateData = {
+              key: 1,
+              canceled: true,
+              done: false
+            }
+          });
 
           nextButton.addEventListener('click', ()=> {
             console.log('Loading: ', repo.loading);
