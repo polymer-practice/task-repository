@@ -26,13 +26,18 @@
             type: String,
             value: '',
             observer: '_createNewTask'
+          },
+          updateData: {
+            type: Object,
+            value: {},
+            observer: '_updateTask'
           }
         };
       }
 
       static get observers() {
         return [
-          '_getPage(offset, limit)'
+          'getPage(offset, limit)'
         ];
       }
 
@@ -142,14 +147,14 @@
         ]
       }
 
-      _getPage() {
+      getPage() {
         const begin = this.offset;
         const end = begin + this.limit;
         const total = this.taskList.length
 
         let pageEvent;
 
-        if ((total >= end) && (begin >= 0)){
+        if ((total >= end) && (begin >= 0)) {
           pageEvent = new CustomEvent(
             'page-event',
             {
@@ -196,11 +201,42 @@
             }
           );
 
-          this.taskList.push({
+          this.taskList.unshift({
             title: newValue,
             canceled: false,
             done: false
           });
+
+          setTimeout(() => {
+            this.loading = false;
+            this.dispatchEvent(newEvent);
+          }, 300);
+        }
+      }
+
+      _updateTask(updateData) {
+        let newEvent;
+
+        if (updateData && updateData.key) {
+          this.loading = true;
+          Object.assign(
+            this.taskList[updateData.key],
+            {
+              canceled: updateData.canceled || false,
+              done: updateData.done || false
+            }
+          )
+
+          newEvent = new CustomEvent(
+            'update-task',
+            {
+              bubbles: true,
+              composed: true,
+              detail: {
+                taskUpdated: this.taskList[updateData.key]
+              }
+            }
+          )
 
           setTimeout(() => {
             this.loading = false;
